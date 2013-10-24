@@ -1,0 +1,250 @@
+<!-- Check the change in the value of the TextBox -->
+
+
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title> Drop Down Details</title>
+	
+	<script type="text/javascript" src = "media/js/jquery-1.10.2.js"></script>
+	<script type="text/javascript" src = "media/js/jquery.dataTables.js"></script>
+	
+	
+	<!-- basic datatable style files -->
+	<style type="text/css" title="currentStyle">
+			@import "media/css/demo_page.css";
+			@import "media/css/demo_table.css";
+	</style>
+	
+	<!-- The row information  is hidden at the start -->
+	<style type="text/css">
+		div.innerDetails{
+			display:none;
+		}
+	</style>
+	
+	<!-- The styling given to the datatable -->
+	<link rel="stylesheet" href="media/css/dt-2-css.css"/>
+	
+</head>
+<body>
+	<div id="information" class="common">
+		<h1>Check the change in the value of the TextBox</h1>
+		<h3> If change in 1 or more values the "Save and Close" Button is enabled</h3>
+		<p> The data is static...</p>
+	</div>
+	
+	<div id = "container" class="common">
+	<table id="example" class = "pretty">
+	<thead>
+		<tr>
+			<th>state</th>
+			<th>Engine</th>
+			<th>Browser</th>
+			<th>CSS Grade</th>	
+		</tr>
+	</thead>
+	<tbody>
+		<tr>	
+			<td class="control"><img src = "media/images/details_open.png"/></td>
+			<td>Trident</td>
+			<td>Internet Explorer 4.0</td>
+			<td><input type="text" value = "0"/> X</td>
+		</tr>
+		
+		<tr>	
+			<td class="control"><img src = "media/images/details_open.png"/></td>
+			<td>Trident</td>
+			<td>Internet Explorer 5.0</td>
+			<td><input type="text" value = "1"/> C</td>
+		</tr>
+
+		<tr>	
+			<td class="control"><img src = "media/images/details_open.png"/></td>
+			<td>Gecko</td>
+			<td>Firefox 1.0</td>
+			<td><input type="text" value = "2"/> A</td>
+		</tr>
+
+		<tr>	
+			<td class="control"><img src = "media/images/details_open.png"/></td>
+			<td>Gecko</td>
+			<td>Firefox 2.0</td>
+			<td><input type="text" value = "3"/> A</td>
+		</tr>
+
+
+		<tr>	
+			<td class="control"><img src = "media/images/details_open.png"/></td>
+			<td>Gecko</td>
+			<td>Firefox 1.5</td>
+			<td><input type="text" value = "4"/> X</td>
+		</tr>	
+
+
+		<tr>	
+			<td class="control"><img src = "media/images/details_open.png"/></td>
+			<td>Trident</td>
+			<td>Internet Explorer 7.0</td>
+			<td><input type="text" value = "5"/> A</td>
+		</tr>	
+
+		<tr>		
+			<td class="control"><img src = "media/images/details_open.png"/></td>
+			<td>Trident</td>
+			<td>Internet Explorer 7.0</td>
+			<td><input type="text" value = "6"/> A</td>
+		</tr>	
+
+		<tr>	
+			<td class="control"><img src = "media/images/details_open.png"/></td>
+			<td>Trident</td>
+			<td>Internet Explorer 7.0</td>
+			<td><input type="text" value = "7"/> A</td>
+		</tr>
+		
+	</tbody>	
+	</table>
+	
+	
+	<!-- Save and  close button-->
+	<input type="button" id="savenclose" value = "Save and Close"/>
+	
+	
+	</div>
+	
+	<script type="text/javascript">
+		
+		$(document).ready(function(){
+			//var anOpen = [];
+			
+			//To count the number of changes.. Initialized zero at the start
+			var count = 0;
+			
+			//'save and close' button disabled at the start
+			$("#savenclose").attr('disabled', 'disabled');
+			
+			//The data inside the opened row
+			var myDivData = ["this is the information for the FIRST div", "this is the information for the SECOND div", "this is the information for the THIRD div"];
+			
+			//Static data of the textboxes for testing
+			var myData = ['0', '1', '2', '3', '4', '5', '6', '7'];
+			
+			
+			//The instance of the Datatable and the respective settings
+			var oTable = $('#example').dataTable({
+				sPaginationType : "full_numbers",
+				"aoColumns": [
+					{ "bSortable": false },
+					null,
+					null,
+					null
+				],
+				"bAutoWidth" : false,
+			});	
+
+			
+			//This part is for opening the clicked row 
+			$("#example td.control").on('click', function(){
+				
+				var nTr = this.parentNode;
+				//console.log($(nTr).index());
+				var rowIndex = $(nTr).index();
+				if(!oTable.fnIsOpen(nTr)){
+					$('img', this).attr('src', 'media/images/details_close.png');
+					//oTable.fnOpen( nTr, fnFormatDetails(oTable, nTr, rowIndex));
+					oTable.fnOpen( nTr, myDivData[rowIndex]);
+				}	
+				else{
+					$('img', this).attr('src', 'media/images/details_open.png');
+					oTable.fnClose(nTr);
+				}
+				
+			});	
+			
+			//propertychange
+			//change	activates on change in focus i.e. when focus is out
+			//paste		activates on paste
+			//keyup		on key up
+			//input 	similar to that of keyup
+			
+			var setTime;
+			//The approach in which the 'input' event is bind under the 'focus' event
+			
+			$(":input[type = 'text']").on("focus", function(e){ 
+					
+					var rowIndex = ($(this).closest('tr').index());
+					var defaultVal = myData[rowIndex];
+					var flag = 0;
+					var currentVal = this.value;
+					var textBox = $(this);
+					var previousVal = currentVal; 
+					//console.log("curr pervious:" + previousVal);					
+					//console.log("current:" + currentVal);					
+							
+					
+					$(this).bind('keyup', function(e){
+						doneTyping(textBox);
+					});
+
+					
+					$(this).blur(function(e){	
+						//console.log('blurring');
+						$(this).unbind('keyup');
+					});
+
+					
+					function doneTyping(textBox){
+						
+						if(textBox.val() !== ""){
+							
+							previousVal = currentVal;
+							currentVal = textBox.val();
+							//console.log("currentVal: " + currentVal);
+						
+							if((currentVal === defaultVal) && (currentVal === previousVal))
+								count = count;
+							
+							if((currentVal !== defaultVal) && (currentVal !== previousVal) && ((defaultVal === previousVal)||(previousVal == "")))
+							//if((currentVal !== defaultVal) && (currentVal !== previousVal))
+								count++;
+							
+							//if((currentVal !== previousVal) && (currentVal !== defaultVal) && (defaultVal !== previousVal))
+							if((currentVal !== previousVal) && (currentVal !== defaultVal))
+								count = count;
+							
+							if((currentVal === defaultVal) && (currentVal !== previousVal) && (defaultVal !== previousVal)){
+								if(previousVal === "")
+									count = count;
+								else if(count > 0)
+									count--;
+								else
+									count = count;
+							}
+							//console.log("prev value:" + previousVal);
+							//console.log("count:" + count);	
+						}
+						
+						if(count > 0)
+							$('#savenclose').removeAttr('disabled');
+						else
+							$('#savenclose').attr('disabled', 'disabled');
+						
+					}
+		
+				});
+		
+		});
+		
+		
+		function fnFormatDetails(theTable, theRow){
+			var theDetails = "<div id = 'innerDetails'>This is a test details tab</div>";
+			return theDetails;
+		}
+		
+		
+	</script>
+	
+</body>
+</html> 
